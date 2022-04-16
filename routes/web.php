@@ -18,11 +18,32 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\KategoriController;
 use App\Http\Controllers\admin\ProdukController;
 use App\Http\Controllers\admin\BrandController;
+use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\ProdukController as Produkctrl;
+use App\Http\Controllers\ShippingController;
 
 Route::get('/', [App\Http\Controllers\HomeController::class , 'index'])->name('home');
 Route::get('/produk/{url}', [ Produkctrl::class , 'detail' ])->name('produk.detail');
+
+//cart
+Route::get('cart', [CartController::class, 'index'])->name('cart');
+Route::post('cart/add', [CartController::class, 'addToCart'])->name('add.cart');
+Route::patch('cart/update', [CartController::class, 'update'])->name('update.cart');
+Route::delete('cart/remove', [CartController::class, 'remove'])->name('remove.cart');
+
+Route::get('shiping/get/{id}' , [ShippingController::class , 'json'])->name('shiping.get');
+
+
+//chackout
+Route::get('checkout' , [CartController::class , 'checkout'])->name('checkout');
+
+Route::get('test' , function(){
+    echo "test";
+    //session(['shipping_id' => 1]);
+    echo  session()->get('shipping_id');
+
+});
 
 Auth::routes([
     'register' => false, // Registration Routes...

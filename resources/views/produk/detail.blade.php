@@ -2,6 +2,9 @@
 @section('title', $produk->title )
 
 @section('head')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.2.0/dist/select2-bootstrap-5-theme.min.css" />
+
     <style>
         .carousel-indicators {
             position: static;
@@ -24,6 +27,45 @@
 
         .title-option{
             color:#0052f5ff;
+            font-weight: 800;
+        }
+
+        .title-produk{
+            overflow-wrap: break-word;
+        }
+
+        .btn-addtocart{
+            height: 55px;
+        }
+
+        .subtotal{
+            color: #0052f5ff;
+            font-size: 40px;
+            font-weight: 800;
+        }
+
+        .btn-ongkir{
+            color: #fff;
+            background: #0052f5ff;
+            border: #0052f5ff;
+            width:100%;
+        }
+
+        .ongkir-nama{
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .ongkir-lokal , .ongkir-nasional{
+            color: #0052f5ff;
+            font-size: 25px;
+            font-weight: 700;
+        }
+        
+        .boxnamekpp .select2-selection{
+            padding-top: 15px;
+            padding-bottom: 35px;
+            text-align: center;
         }
     </style>
 @endsection
@@ -78,9 +120,30 @@
         </div>
 
         <div class="col-md-5">
-            <h1>{{ $produk->title }}</h1>
+            <h1 class="title-produk">{{ $produk->title }}</h1>
+            
+            <div class="row mb-3">
+            
+                <div class="col-md-6">
+                    <img src="{{ asset('assets/img/bintang.png') }}" alt >
+                </div>
 
-            <h2 class="mb-4 mt-4">
+                <div class="col-md-6 fw-bold">
+                    Terjual : 1.2K
+                </div>
+            </div>
+
+            <div class="row mb-3">
+            
+                <div class="col-md-6 fw-bold">
+                    <img width="25px" src="{{ asset('assets/img/hart.png') }}" alt > Tambah ke Favorit
+                </div>
+                <div class="col-md-6 fw-bold">
+                    <img width="25px" src="{{ asset('assets/img/share.png') }}" alt > Bagukan Produk
+                </div>
+            </div>
+
+            <h2 class="mb-4">
                 @php
                 $price = $produk->price
                 @endphp
@@ -125,18 +188,65 @@
         </div>
 
         <div class="col-md-3">
-            <h5 class="title-option">Atur Jumlah Dan Catatan</h5>
-            <form class="row g-3">
-                <div class="col-3 border border-dark rounded-2">
+            <h5 class="title-option mb-2">Atur Jumlah Dan Catatan</h5>
+            <form class="row g-3 m-0" action="{{ route('add.cart') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $produk->id }}">
+                <div class="col-4 mt-1 border border-dark rounded-2">
                   <label for="exampleFormControlInput1" class="form-label col-form-label-sm m-0 p-0">Quantity</label>
-                  <input type="number" class="form-control text-center border-0 m-0" id="qty" value="1">
+                  <input type="number" class="form-control text-start border-0 m-0 p-0" id="qty" name="qty" value="1">
                 </div>
-                <div class="col-9 h-100">
+                <div class="col-8 mt-1 h-100">
                     <div class="d-grid gap-1">
-                        <button type="submit" class="btn btn-danger btn-lg">ADD TO CARD</button>
+                        <button type="submit" class="btn btn-danger btn-lg btn-addtocart">ADD TO CART</button>
                     </div>
                 </div>
               </form>
+              <div class="row mt-2 mb-2">
+                <div class="col-md-12 text-center">
+                    <img width="150px" src="{{ asset('assets/img/tambah-catatan.png') }}" alt>
+                </div>
+              </div>
+              <hr />
+              <div class="row">
+                <div class="col-md-12">
+                    Subtotal
+                    <p  class="subtotal pt-1">
+                        Rp. {{ number_format($price[0]['price']) }}
+                    </p>
+                </div> 
+              </div>
+
+              <hr />
+
+              <div class="row">
+                <div class="col-md-12 boxnamekpp">
+                    <select  class="form-control select2-single" id="namekpp" placeholder="Masukan Nama KPP">
+                        <option></option>               
+
+                        @foreach ( $shipping as $sp )
+                            <option value="{{ $sp['id'] }}">{{ $sp['nama'] }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="btn btn-danger btn-lg btn-ongkir">Hitung Ongkos Kirim</button>
+                </div> 
+                <div class="mt-4 text-center">
+                    <img width="130px" src="{{ asset('assets/img/kirim-ke.png') }}" alt >
+                </div>
+                <div class="mt-4 text-center ongkir-nama">
+                    {{ $shipping_now['nama'] }}
+                </div>
+                <div class="mt-4 text-center">
+                    Pengiriman Lokal
+                    <p class="text-center mt-2 ongkir-lokal">Rp {{ number_format($shipping_now['harga']) }}/Kg</p>
+                </div>
+                <div class="mt-4 text-center">
+                    Pengiriman Nasional
+                    <p class="text-center mt-2 ongkir-nasional">Rp {{ number_format($shipping_now['harga_nasional']) }}/Kg</p>
+                </div>
+
+
+              </div>
            
         </div>
 
@@ -242,4 +352,40 @@
 <!-- trending-product-area-end -->
 
 
+@endsection
+@section('footer')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+    
+    <script>
+        function addCommas(nStr)
+        {
+            nStr += '';
+            x = nStr.split('.');
+            x1 = x[0];
+            x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        }
+
+        $(document).ready(function() {
+            $('#namekpp').select2( {
+				placeholder: 'Masukan Nama KPP',
+                theme: 'bootstrap-5'
+			} );
+
+            $('#namekpp').on('select2:select', function (e) {
+                var data = e.params.data;
+                console.log(data.id);
+                $.getJSON( "{{ route('shiping.get' , '') }}/"+data.id, function( data ) {
+                    console.log(data);
+                    $('.ongkir-nama').html(data.nama);
+                    $('.ongkir-lokal').html('Rp. '+addCommas(data.harga)+'/Kg');
+                    $('.ongkir-nasional').html('Rp. '+addCommas(data.harga_nasional)+'/Kg');
+                });
+            });
+        });
+    </script>
 @endsection

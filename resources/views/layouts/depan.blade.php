@@ -115,7 +115,9 @@
                                 <div class="block-cart action">
                                     <a class="icon-link icon-link-2" href="#">
                                     <i class="flaticon-custom"><img src="{{ asset('assets/img/svg/icon_custom_cart.svg') }}" alt=""></i>
-                                    <span class="count count-2">1</span>
+                                    @if(session('cart'))
+                                    <span class="count count-2">{{ count(session('cart')) }}</span>
+                                    @endif
                                     <span class="text"><span class="sub">Belanja</span></span>
                                     </a>
                                     <div class="cart">
@@ -124,38 +126,49 @@
                                                 <li>
                                                   <div class="cart__title">
                                                     <h4>Your Cart</h4>
-                                                    <span>(1 Item in Cart)</span>
+                                                    <span>({{ count(session('cart')) }} Item in Cart)</span>
                                                   </div>
                                                 </li>
-                                                <li>
-                                                  <div class="cart__item d-flex justify-content-between align-items-center">
-                                                    <div class="cart__inner d-flex">
-                                                      <div class="cart__thumb">
-                                                        <a href="#">
-                                                          <img src="{{ asset('assets/img/cart/20.jpg') }}" alt="">
-                                                        </a>
-                                                      </div>
-                                                      <div class="cart__details">
-                                                        <h6><a href="#"> Samsung C49J89: £875, Debenhams Plus  </a></h6>
-                                                        <div class="cart__price">
-                                                          <span>$255.00</span>
+                                                @php $total = 0 @endphp
+                                                @if(session('cart'))
+                                                    @foreach(session('cart') as $id => $details)
+                                                    <li>
+                                                        <div class="cart__item d-flex justify-content-between align-items-center">
+                                                            <div class="cart__inner d-flex">
+                                                            <div class="cart__thumb">
+                                                                <a href="#">
+                                                                <img src="{{ url($details['image']) }}"  alt="">
+                                                                </a>
+                                                            </div>
+                                                            <div class="cart__details">
+                                                                <h6><a href="#"> {{ $details['nama'] }} </a></h6>
+                                                                <div class="cart__price">
+                                                                <span>Rp. {{ number_format($details['harga']) }}</span>
+                                                                </div>
+                                                                
+                                                            </div>
+                                                            </div>
+                                                            <div class="cart__del">
+                                                                {{--<a href="#"><i class="fal fa-times"></i></a>--}}
+                                                                <span> x {{ $details['qty'] }}</span>
+                                                            </div>
                                                         </div>
-                                                      </div>
-                                                    </div>
-                                                    <div class="cart__del">
-                                                        <a href="#"><i class="fal fa-times"></i></a>
-                                                    </div>
-                                                  </div>
-                                                </li>
+                                                    </li>
+                                                    @php
+                                                        $total += $details['harga'] * $details['qty'];
+                                                    @endphp
+                                                    @endforeach
+                                                @endif
+
                                                 <li>
                                                   <div class="cart__sub d-flex justify-content-between align-items-center">
                                                     <h6>Subtotal</h6>
-                                                    <span class="cart__sub-total">$255.00</span>
+                                                    <span class="cart__sub-total">Rp. {{ number_format($total) }}</span>
                                                   </div>
                                                 </li>
                                                 <li>
-                                                    <a href="#" class="wc-cart mb-10">View cart</a>
-                                                    <a href="#" class="wc-checkout">Checkout</a>
+                                                    <a href="{{ route('cart') }}" class="wc-cart mb-10">View cart</a>
+                                                    <a href="{{ route('checkout') }}" class="wc-checkout">Checkout</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -582,7 +595,7 @@
     <script src="{{ asset('assets/js/magnific-popup.js') }}"></script>
     <script src="{{ asset('assets/js/parallax.js') }}"></script>
     <script src="{{ asset('assets/js/backtotop.js') }}"></script>
-    <script src="{{ asset('assets/js/nice-select.js') }}"></script>
+    {{--<script src="{{ asset('assets/js/nice-select.js') }}"></script>--}}
     <script src="{{ asset('assets/js/countdown.min.js') }}"></script>
     <script src="{{ asset('assets/js/counterup.js') }}"></script>
     <script src="{{ asset('assets/js/wow.js') }}"></script>
